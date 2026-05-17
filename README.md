@@ -2,13 +2,13 @@
 
 An ESPHome configuration for the [Seeed reTerminal E1003](https://www.seeedstudio.com/reTerminal-E1003-p-5811.html) 10.3-inch e-ink display, showing stylish solar production data from Home Assistant.
 
-![Display photo](images/display.jpg)
+![Display photo](images/display.JPG)
 
 ---
 
 ## Based on
 
-This project builds on the ESPHome driver by [koosoli](https://github.com/koosoli/Seeed-10.3-inch-IT8951-ESPHome-Drivers/tree/main/), which provides the custom `it8951_reterminal_e1003` display component. The driver handles low-level communication with the IT8951 e-ink controller. This repository adds a complete solar dashboard layout with Home Assistant sensor integration. Please note that the display is using Swedish language. I have kept this through the yaml, in order to compare code with image. Will translate relevant terms below.
+This project builds on the ESPHome driver by [koosoli](https://github.com/koosoli/Seeed-10.3-inch-IT8951-ESPHome-Drivers/tree/main/), which provides the custom `it8951_reterminal_e1003` display component. The driver handles low-level communication with the IT8951 e-ink controller. This repository adds a complete solar dashboard layout with Home Assistant sensor integration. Please note that the display is using Swedish language. I have kept this through the yaml, in order to compare code with image. Will translate relevant terms below. Full disclaimer: this project was only made possible through extensive help from the AI Claude.
 
 ---
 
