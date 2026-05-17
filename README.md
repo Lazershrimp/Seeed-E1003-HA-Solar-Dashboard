@@ -10,16 +10,16 @@ An ESPHome configuration for the [Seeed reTerminal E1003](https://www.seeedstudi
 
 ## Based on
 
-This project builds on the ESPHome driver by [koosoli](https://github.com/koosoli/Seeed-10.3-inch-IT8951-ESPHome-Drivers/tree/main/), which provides the custom `it8951_reterminal_e1003` display component. The driver handles low-level communication with the IT8951 e-ink controller. This repository adds a complete solar dashboard layout with Home Assistant sensor integration.
+This project builds on the ESPHome driver by [koosoli](https://github.com/koosoli/Seeed-10.3-inch-IT8951-ESPHome-Drivers/tree/main/), which provides the custom `it8951_reterminal_e1003` display component. The driver handles low-level communication with the IT8951 e-ink controller. This repository adds a complete solar dashboard layout with Home Assistant sensor integration. Please note that the display is using Swedish language. I have kept this through the yaml, in order to compare code with image. Will translate relevant terms below.
 
 ---
 
 ## Features
 
-- **Section 1 — Solar energy today:** Four boxes showing produced, exported, imported and total consumed energy
-- **Section 2 — Last 6 days:** Rolling display with yesterday rightmost, updates daily
-- **Section 3 — Monthly overview:** All 12 months in two rows; months without data show `---`
-- **Section 4 — Per year + Lifetime totals:** Current year auto-summed from monthly helpers; lifetime produced, self-consumed, imported and exported totals
+- **Section 1 — Solar energy today: (Solenergi idag)** Four boxes showing produced, exported, imported and total consumed energy
+- **Section 2 — Last 6 days: (Solenergi senaste veckan)** Rolling display with yesterday rightmost, updates daily
+- **Section 3 — Monthly overview: (Solenergi per månad)** All 12 months in two rows; months without data show `---`
+- **Section 4 — Per year (Solenergi per år) + Lifetime totals: (Solenergi totalt)** Current year auto-summed from monthly helpers; lifetime produced, self-consumed, imported and exported totals
 - **Battery and WiFi status** icons in the top-right corner
 - **Physical refresh button** (KEY0/GPIO3) triggers an immediate display update
 - **HA button entity** for remote refresh from the Home Assistant dashboard
@@ -45,7 +45,7 @@ Clone or download the custom component from [koosoli's repository](https://githu
 
 ### Home Assistant sensors
 
-The following sensors must exist in your Home Assistant instance. These are typically provided by your inverter integration (e.g. Solis, SolarEdge, Huawei):
+The following sensors must exist in your Home Assistant instance. These are typically provided by your inverter integration (e.g. Solis, SolarEdge, Huawei - I am using Sungrow, fetching data through modbus):
 
 | Sensor | Description |
 |---|---|
