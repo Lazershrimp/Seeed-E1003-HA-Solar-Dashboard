@@ -2,7 +2,7 @@
 A custom solar dashboard for the Seeed re-Terminal E1003 e-ink display, connected to Home Assistant by ESPHome 
 # Seeed reTerminal E1003 — Solar Dashboard for Home Assistant
 
-An ESPHome configuration for the [Seeed reTerminal E1003](https://www.seeedstudio.com/reTerminal-E1003-p-5811.html) 10.3-inch e-ink display, showing solar production data from Home Assistant.
+An ESPHome configuration for the [Seeed reTerminal E1003](https://www.seeedstudio.com/reTerminal-E1003-p-5811.html) 10.3-inch e-ink display, showing stylish solar production data from Home Assistant.
 
 ![Display photo](images/display.jpg)
 
@@ -16,10 +16,10 @@ This project builds on the ESPHome driver by [koosoli](https://github.com/koosol
 
 ## Features
 
-- **Section 1 — Solar energy today: (Solenergi idag)** Four boxes showing produced, exported, imported and total consumed energy
-- **Section 2 — Last 6 days: (Solenergi senaste veckan)** Rolling display with yesterday rightmost, updates daily
-- **Section 3 — Monthly overview: (Solenergi per månad)** All 12 months in two rows; months without data show `---`
-- **Section 4 — Per year (Solenergi per år) + Lifetime totals: (Solenergi totalt)** Current year auto-summed from monthly helpers; lifetime produced, self-consumed, imported and exported totals
+- **Section 1 — Solar energy today (Solenergi idag):** Four boxes showing produced, exported, imported and total consumed energy
+- **Section 2 — Last 6 days (Solenergi senaste veckan):** Rolling display with yesterday rightmost, updates daily
+- **Section 3 — Monthly overview (Solenergi per månad):** All 12 months in two rows; months without data show `---`
+- **Section 4 — Per year (Solenergi per år) + Lifetime totals (Solenergi totalt):** Current year auto-summed from monthly helpers; lifetime produced, self-consumed, imported and exported totals
 - **Battery and WiFi status** icons in the top-right corner
 - **Physical refresh button** (KEY0/GPIO3) triggers an immediate display update
 - **HA button entity** for remote refresh from the Home Assistant dashboard
