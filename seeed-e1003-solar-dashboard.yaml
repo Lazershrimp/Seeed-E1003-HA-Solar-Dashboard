@@ -1,0 +1,480 @@
+substitutions:
+  device_name: seeed-e1003
+  friendly_name: Seeed E1003
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  on_boot:
+    priority: 600
+    then:
+      - output.turn_on: epd_enable
+      - output.turn_on: ite_enable
+      - output.turn_on: vbat_enable
+      - delay: 500ms
+
+output:
+  - platform: gpio
+    pin: GPIO11
+    id: epd_enable
+  - platform: gpio
+    pin: GPIO21
+    id: ite_enable
+  - platform: gpio
+    pin: GPIO40
+    id: vbat_enable
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: arduino
+    advanced:
+      enable_idf_experimental_features: True
+  flash_size: 32MB
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+logger:
+
+api:
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  power_save_mode: light
+  ap:
+    ssid: "seeed-e1003 Fallback"
+    password: "12345678"
+
+captive_portal:
+
+external_components:
+  - source:
+      type: local
+      path: custom_components
+    components: [it8951_reterminal_e1003]
+
+spi:
+  clk_pin: GPIO7
+  mosi_pin: GPIO9
+  miso_pin: GPIO8
+
+sensor:
+  # ── Daily sensors ──
+  - platform: homeassistant
+    id: daily_pv_generation
+    entity_id: sensor.daily_pv_generation
+  - platform: homeassistant
+    id: daily_exported_energy
+    entity_id: sensor.daily_exported_energy
+  - platform: homeassistant
+    id: daily_imported_energy
+    entity_id: sensor.daily_imported_energy
+  - platform: homeassistant
+    id: daily_consumed_energy
+    entity_id: sensor.daily_consumed_energy
+  # ── Lifetime total sensors ──
+  - platform: homeassistant
+    id: total_pv_generation
+    entity_id: sensor.total_pv_generation
+  - platform: homeassistant
+    id: total_imported_energy
+    entity_id: sensor.total_imported_energy
+  - platform: homeassistant
+    id: total_direct_energy
+    entity_id: sensor.total_direct_energy_consumption
+  - platform: homeassistant
+    id: total_exported_energy
+    entity_id: sensor.total_exported_energy
+  # ── Weekday helpers (input_number, min=-1 for "no data") ──
+  - platform: homeassistant
+    id: solar_mandag
+    entity_id: input_number.solar_mandag
+  - platform: homeassistant
+    id: solar_tisdag
+    entity_id: input_number.solar_tisdag
+  - platform: homeassistant
+    id: solar_onsdag
+    entity_id: input_number.solar_onsdag
+  - platform: homeassistant
+    id: solar_torsdag
+    entity_id: input_number.solar_torsdag
+  - platform: homeassistant
+    id: solar_fredag
+    entity_id: input_number.solar_fredag
+  - platform: homeassistant
+    id: solar_lordag
+    entity_id: input_number.solar_lordag
+  - platform: homeassistant
+    id: solar_sondag
+    entity_id: input_number.solar_sondag
+  # ── Monthly helpers (input_number, min=-1 for "no data") ──
+  - platform: homeassistant
+    id: solar_januari
+    entity_id: input_number.solar_januari
+  - platform: homeassistant
+    id: solar_februari
+    entity_id: input_number.solar_februari
+  - platform: homeassistant
+    id: solar_mars
+    entity_id: input_number.solar_mars
+  - platform: homeassistant
+    id: solar_april
+    entity_id: input_number.solar_april
+  - platform: homeassistant
+    id: solar_maj
+    entity_id: input_number.solar_maj
+  - platform: homeassistant
+    id: solar_juni
+    entity_id: input_number.solar_juni
+  - platform: homeassistant
+    id: solar_juli
+    entity_id: input_number.solar_juli
+  - platform: homeassistant
+    id: solar_augusti
+    entity_id: input_number.solar_augusti
+  - platform: homeassistant
+    id: solar_september
+    entity_id: input_number.solar_september
+  - platform: homeassistant
+    id: solar_oktober
+    entity_id: input_number.solar_oktober
+  - platform: homeassistant
+    id: solar_november
+    entity_id: input_number.solar_november
+  - platform: homeassistant
+    id: solar_december
+    entity_id: input_number.solar_december
+  # ── Yearly helpers (input_number, manually entered) ──
+  - platform: homeassistant
+    id: solar_2023
+    entity_id: input_number.solar_2023
+  - platform: homeassistant
+    id: solar_2024
+    entity_id: input_number.solar_2024
+  - platform: homeassistant
+    id: solar_2025
+    entity_id: input_number.solar_2025
+  # ── Hardware sensors ──
+  - platform: adc
+    pin: GPIO1
+    id: battery_voltage
+    name: "Battery Voltage"
+    update_interval: 3600s
+    attenuation: 12db
+    filters:
+      - multiply: 2.0
+      - lambda: |-
+          if (x > 4.14) return 4.14;
+          if (x < 3.0) return 3.0;
+          return x;
+  - platform: wifi_signal
+    id: wifi_signal_strength
+    name: "WiFi Signal"
+    update_interval: 3600s
+
+font:
+  - file: "gfonts://Josefin Sans"
+    id: font_small
+    size: 28
+    glyphs: "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ °åäöÅÄÖ"
+  - file: "gfonts://Josefin Sans@700"
+    id: font_large
+    size: 40
+    glyphs: "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ °åäöÅÄÖ"
+  - file: "gfonts://Josefin Sans@700"
+    id: font_xlarge
+    size: 80
+    glyphs: "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ °åäöÅÄÖ"
+  - file: "gfonts://Josefin Sans@700"
+    id: font_heading
+    size: 48
+    glyphs: "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ °åäöÅÄÖ"
+  - file: "https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/fonts/materialdesignicons-webfont.ttf"
+    id: font_icons
+    size: 40
+    glyphs:
+      - "\U000F12A3"  # battery-high
+      - "\U000F12A2"  # battery-medium
+      - "\U000F12A1"  # battery-low
+      - "\U000F10CD"  # battery-alert-variant-outline
+      - "\U000F17E9"  # battery-remove-outline
+      - "\U000F0928"  # wifi-strength-4 (100%)
+      - "\U000F0925"  # wifi-strength-3 (75%)
+      - "\U000F0922"  # wifi-strength-2 (50%)
+      - "\U000F091F"  # wifi-strength-1 (25%)
+      - "\U000F092B"  # wifi-strength-alert-outline
+
+display:
+  - platform: it8951_reterminal_e1003
+    id: epaper_display
+    vcom: 1400
+    update_interval: 3600s  # Refresh once per hour
+    lambda: |-
+      // No update between 22:00 and 06:00 to save battery
+      auto now = id(sntp_time).now();
+      if (!now.is_valid()) return;
+      if (now.hour < 6 || now.hour >= 22) return;
+
+      const auto WHITE = Color(0, 0, 0, 0);
+      const auto BLACK = Color(255, 255, 255, 255);
+
+      it.fill(BLACK);
+
+      // Helper: format float with comma decimal separator, 1 decimal place
+      auto fmt_komma1 = [](float v, char* buf, size_t len) {
+        snprintf(buf, len, "%.1f", v);
+        for (size_t i = 0; i < len; i++) if (buf[i] == '.') { buf[i] = ','; break; }
+      };
+
+      char tbuf[32];
+
+      // ════════════════════════════════════════════════
+      // SECTION 1: Solar energy today
+      // ════════════════════════════════════════════════
+      it.print(40, 40, id(font_heading), WHITE, "Solenergi idag");
+
+      // Battery and WiFi status icons (top right)
+      float wifi = id(wifi_signal_strength).state;
+      const char* wifi_icon;
+      if (wifi >= -60) wifi_icon = "\U000F0928";
+      else if (wifi >= -70) wifi_icon = "\U000F0925";
+      else if (wifi >= -80) wifi_icon = "\U000F0922";
+      else if (wifi >= -90) wifi_icon = "\U000F091F";
+      else wifi_icon = "\U000F092B";
+
+      float batt_v = id(battery_voltage).state;
+      float batt_pct = ((batt_v - 3.0f) / (4.14f - 3.0f)) * 100.0f;
+      const char* batt_icon;
+      if (isnan(batt_pct)) {
+        batt_icon = "\U000F17E9";
+      } else {
+        if (batt_pct > 100) batt_pct = 100;
+        if (batt_pct < 0) batt_pct = 0;
+        if (batt_pct >= 67) batt_icon = "\U000F12A3";
+        else if (batt_pct >= 33) batt_icon = "\U000F12A2";
+        else if (batt_pct >= 10) batt_icon = "\U000F12A1";
+        else batt_icon = "\U000F10CD";
+      }
+      it.print(1760, 45, id(font_icons), WHITE, wifi_icon);
+      it.print(1640, 45, id(font_icons), WHITE, batt_icon);
+      if (isnan(batt_pct)) {
+        it.print(1680, 58, id(font_small), WHITE, "--%");
+      } else {
+        it.printf(1680, 58, id(font_small), WHITE, "%.0f%%", batt_pct);
+      }
+
+      // 4 boxes, height 160px, y=98..258
+      const int box_y = 98;
+      const int box_h = 160;
+
+      // Box 1: Solar energy produced today
+      it.rectangle(40, box_y, 440, box_h, WHITE);
+      it.print(60, box_y + 10, id(font_small), WHITE, "Producerad solenergi idag");
+      fmt_komma1(id(daily_pv_generation).state, tbuf, sizeof(tbuf));
+      it.printf(60, box_y + 55, id(font_xlarge), WHITE, "%s", tbuf);
+      it.print(252, box_y + 85, id(font_large), WHITE, "kWh");
+
+      // Box 2: Solar energy exported today
+      it.rectangle(490, box_y, 440, box_h, WHITE);
+      it.print(510, box_y + 10, id(font_small), WHITE, "Såld solenergi idag");
+      fmt_komma1(id(daily_exported_energy).state, tbuf, sizeof(tbuf));
+      it.printf(510, box_y + 55, id(font_xlarge), WHITE, "%s", tbuf);
+      it.print(702, box_y + 85, id(font_large), WHITE, "kWh");
+
+      // Box 3: Grid energy imported today
+      it.rectangle(940, box_y, 440, box_h, WHITE);
+      it.print(962, box_y + 10, id(font_small), WHITE, "Köpt energi idag");
+      fmt_komma1(id(daily_imported_energy).state, tbuf, sizeof(tbuf));
+      it.printf(962, box_y + 55, id(font_xlarge), WHITE, "%s", tbuf);
+      it.print(1154, box_y + 85, id(font_large), WHITE, "kWh");
+
+      // Box 4: Total energy consumed today
+      it.rectangle(1390, box_y, 440, box_h, WHITE);
+      it.print(1412, box_y + 10, id(font_small), WHITE, "Total använd energi idag");
+      fmt_komma1(id(daily_consumed_energy).state, tbuf, sizeof(tbuf));
+      it.printf(1412, box_y + 55, id(font_xlarge), WHITE, "%s", tbuf);
+      it.print(1604, box_y + 85, id(font_large), WHITE, "kWh");
+
+      // ════════════════════════════════════════════════
+      // SECTION 2: Solar energy last 7 days
+      // Shows 6 days with yesterday rightmost, rolling daily
+      // ════════════════════════════════════════════════
+      it.print(40, 305, id(font_heading), WHITE, "Solenergi senaste veckan");
+      it.line(40, 363, 1832, 363, WHITE);
+
+      // Day names and sensor values, indexed 0=Monday..6=Sunday
+      const char* alla_dagar[] = {"Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag", "Söndag"};
+      float alla_vecka[] = {
+        id(solar_mandag).state,
+        id(solar_tisdag).state,
+        id(solar_onsdag).state,
+        id(solar_torsdag).state,
+        id(solar_fredag).state,
+        id(solar_lordag).state,
+        id(solar_sondag).state
+      };
+
+      // now.day_of_week: 1=Sunday, 2=Monday, ..., 7=Saturday (ESPHome/C tm_wday)
+      // Convert to 0=Monday..6=Sunday
+      int idag_idx = (now.day_of_week + 5) % 7;
+      int gardag_idx = (idag_idx + 6) % 7;  // yesterday
+
+      int dag_bredd = 290;
+      int dag_gap = 10;
+      // Draw 6 days, position 0=oldest (5 days ago) to 5=yesterday
+      for (int i = 0; i < 6; i++) {
+        int dag_idx = (gardag_idx - 5 + i + 7) % 7;
+        int x = 40 + i * (dag_bredd + dag_gap);
+        it.print(x + 10, 377, id(font_small), WHITE, alla_dagar[dag_idx]);
+        float v = alla_vecka[dag_idx];
+        if (isnan(v) || v < 0) {
+          it.print(x + 10, 413, id(font_heading), WHITE, "---");
+        } else {
+          fmt_komma1(v, tbuf, sizeof(tbuf));
+          it.printf(x + 10, 413, id(font_heading), WHITE, "%s", tbuf);
+        }
+        it.print(x + 10, 465, id(font_small), WHITE, "kWh");
+      }
+
+      // ════════════════════════════════════════════════
+      // SECTION 3: Solar energy per month
+      // Values < 0 display as "---" (helper default = -1)
+      // ════════════════════════════════════════════════
+      it.print(40, 535, id(font_heading), WHITE, "Solenergi per månad");
+
+      const char* manader[] = {
+        "Januari", "Februari", "Mars", "April", "Maj", "Juni",
+        "Juli", "Augusti", "September", "Oktober", "November", "December"
+      };
+      float manad_data[] = {
+        id(solar_januari).state,
+        id(solar_februari).state,
+        id(solar_mars).state,
+        id(solar_april).state,
+        id(solar_maj).state,
+        id(solar_juni).state,
+        id(solar_juli).state,
+        id(solar_augusti).state,
+        id(solar_september).state,
+        id(solar_oktober).state,
+        id(solar_november).state,
+        id(solar_december).state
+      };
+      int man_bredd = 290;
+      int man_gap = 10;
+
+      // Row 1: January–June  (box y=593, height=150, ends y=743)
+      for (int i = 0; i < 6; i++) {
+        int x = 40 + i * (man_bredd + man_gap);
+        it.rectangle(x, 593, man_bredd, 150, WHITE);
+        it.print(x + 10, 607, id(font_small), WHITE, manader[i]);
+        float v = manad_data[i];
+        if (isnan(v) || v < 0) {
+          it.print(x + 10, 643, id(font_heading), WHITE, "---");
+        } else {
+          it.printf(x + 10, 643, id(font_heading), WHITE, "%.0f", v);
+        }
+        it.print(x + 10, 700, id(font_small), WHITE, "kWh");
+      }
+      // Row 2: July–December  (box y=755, height=150, ends y=905)
+      for (int i = 6; i < 12; i++) {
+        int x = 40 + (i - 6) * (man_bredd + man_gap);
+        it.rectangle(x, 755, man_bredd, 150, WHITE);
+        it.print(x + 10, 769, id(font_small), WHITE, manader[i]);
+        float v = manad_data[i];
+        if (isnan(v) || v < 0) {
+          it.print(x + 10, 805, id(font_heading), WHITE, "---");
+        } else {
+          it.printf(x + 10, 805, id(font_heading), WHITE, "%.0f", v);
+        }
+        it.print(x + 10, 862, id(font_small), WHITE, "kWh");
+      }
+
+      // ════════════════════════════════════════════════
+      // SECTION 4: Per year (left) + Lifetime totals (right)
+      // Section divider lines align with Feb/Aug and Mars/Sep box edges
+      // ════════════════════════════════════════════════
+      it.print(40, 946, id(font_heading), WHITE, "Solenergi per år");
+      it.print(650, 946, id(font_heading), WHITE, "Solenergi totalt");
+      it.line(40, 1004, 630, 1004, WHITE);   // under "per år", ends at right edge of Feb/Aug
+      it.line(640, 1004, 1832, 1004, WHITE); // under "totalt", starts at left edge of Mars/Sep
+
+      // Current year (2026) is summed automatically from monthly helpers
+      float sum_2026 = 0;
+      for (int i = 0; i < 12; i++) {
+        float v = manad_data[i];
+        if (!isnan(v) && v >= 0) sum_2026 += v;
+      }
+
+      const char* ar_namn[] = {"2023", "2024", "2025", "2026"};
+      float ar_data[] = {
+        id(solar_2023).state,
+        id(solar_2024).state,
+        id(solar_2025).state,
+        sum_2026
+      };
+      int ar_y0 = 1016;
+      int ar_rad = 70;
+      // Year label and unit aligned vertically with the value (font_large=40px, font_small=28px -> offset=6px)
+      for (int i = 0; i < 4; i++) {
+        it.print(50, ar_y0 + i * ar_rad + 6, id(font_small), WHITE, ar_namn[i]);
+        it.printf(170, ar_y0 + i * ar_rad, id(font_large), WHITE, "%.0f", ar_data[i]);
+        it.print(350, ar_y0 + i * ar_rad + 6, id(font_small), WHITE, "kWh");
+      }
+
+      // Lifetime totals — left column (x=650): produced + self-consumed
+      it.print(650, 1016, id(font_small), WHITE, "Producerad solenergi totalt");
+      it.printf(650, 1054, id(font_xlarge), WHITE, "%.0f", id(total_pv_generation).state);
+      it.print(900, 1084, id(font_large), WHITE, "kWh");
+
+      it.print(650, 1188, id(font_small), WHITE, "Direktanvänd solenergi totalt");
+      it.printf(650, 1226, id(font_xlarge), WHITE, "%.0f", id(total_direct_energy).state);
+      it.print(900, 1256, id(font_large), WHITE, "kWh");
+
+      // Lifetime totals — right column (x=1240): imported + exported
+      it.print(1240, 1016, id(font_small), WHITE, "Köpt nätenergi totalt");
+      it.printf(1240, 1054, id(font_xlarge), WHITE, "%.0f", id(total_imported_energy).state);
+      it.print(1490, 1084, id(font_large), WHITE, "kWh");
+
+      it.print(1240, 1188, id(font_small), WHITE, "Såld solenergi totalt");
+      it.printf(1240, 1226, id(font_xlarge), WHITE, "%.0f", id(total_exported_energy).state);
+      it.print(1490, 1256, id(font_large), WHITE, "kWh");
+
+      // ════════════════════════════════════════════════
+      // Footer
+      // ════════════════════════════════════════════════
+      it.line(40, 1349, 1832, 1349, WHITE);
+      it.printf(40, 1361, id(font_small), WHITE, "Seeed reTerminal E1003 uppdaterad kl. %02d.%02d",
+        id(sntp_time).now().hour, id(sntp_time).now().minute);
+
+button:
+  - platform: template
+    name: "Uppdatera display"
+    on_press:
+      then:
+        - component.update: epaper_display
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO3  # Screen Refresh button (KEY0) — WARNING: GPIO3 is a strapping pin
+      mode: INPUT_PULLUP
+    id: screen_refresh_button
+    name: "Screen Refresh Button"
+    filters:
+      - delayed_on: 50ms  # Debounce
+    on_press:
+      then:
+        - component.update: epaper_display
+
+time:
+  - platform: sntp
+    id: sntp_time
+    timezone: "Europe/Stockholm"
