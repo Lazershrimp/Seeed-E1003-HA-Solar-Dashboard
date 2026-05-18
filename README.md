@@ -1,6 +1,6 @@
 # Seeed reTerminal E1003 — Solar Dashboard for Home Assistant
 
-An ESPHome configuration for the [Seeed reTerminal E1003](https://www.seeedstudio.com/reTerminal-E1003-p-5811.html) 10.3-inch e-ink display, showing stylish solar production data from Home Assistant.
+An ESPHome configuration for the [Seeed reTerminal E1003](https://www.seeedstudio.com/reTerminal-E1003-p-6731.html) 10.3-inch e-ink display, showing stylish solar production data from Home Assistant.
 
 ![Display photo](images/display.JPG)
 
