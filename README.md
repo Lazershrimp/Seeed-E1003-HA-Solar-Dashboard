@@ -14,10 +14,10 @@ This project builds on the ESPHome driver by [koosoli](https://github.com/koosol
 
 ## Features
 
-- **Section 1 — Energy today:** Four boxes showing produced solar energy, total household consumption, grid energy imported, and self-consumed solar energy
-- **Section 2 — Last 6 days:** Rolling display with yesterday rightmost, updates daily
-- **Section 3 — Monthly overview:** All 12 months in two rows; current month updated live from utility meter; months without data show `---`
-- **Section 4 — Per year + Lifetime totals:** Current year auto-summed from yearly utility meter + offset; lifetime produced, self-consumed, imported and exported totals
+- **Section 1 — Energy today (Solenergi idag):** Four boxes showing produced solar energy (Producerad solenergi), total household consumption (Husets energiförbrukning), grid energy imported (Varav köpt energi), and self-consumed solar energy (Använd solel idag)
+- **Section 2 — Last 6 days (Solenergi senaste veckan):** Rolling display with yesterday rightmost, updates daily
+- **Section 3 — Monthly overview (Solenergi per månad):** All 12 months in two rows; current month updated live from utility meter; months without data show `---`
+- **Section 4 — Per year (Solenergi per år) + Lifetime totals (Solenergi totalt):** Current year auto-summed from yearly utility meter + offset; lifetime produced (Producerrad solenergi totalt), self-consumed (Direktanvänd solenergi totalt), imported (Köpt nätenergi totalt) and exported (Såld solenergi totalt) totals
 - **Battery and WiFi status** icons in the top-right corner, updated every 15 minutes
 - **Physical refresh button** (KEY0/GPIO3) triggers an immediate display update
 - **HA button entity** for remote refresh from the Home Assistant dashboard
