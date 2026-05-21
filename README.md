@@ -14,15 +14,15 @@ This project builds on the ESPHome driver by [koosoli](https://github.com/koosol
 
 ## Features
 
-- **Section 1 — Solar energy today (Solenergi idag):** Four boxes showing produced, exported, imported and total consumed energy
-- **Section 2 — Last 6 days (Solenergi senaste veckan):** Rolling display with yesterday rightmost, updates daily
-- **Section 3 — Monthly overview (Solenergi per månad):** All 12 months in two rows; months without data show `---`
-- **Section 4 — Per year (Solenergi per år) + Lifetime totals (Solenergi totalt):** Current year auto-summed from monthly helpers; lifetime produced, self-consumed, imported and exported totals
-- **Battery and WiFi status** icons in the top-right corner
+- **Section 1 — Energy today:** Four boxes showing produced solar energy, total household consumption, grid energy imported, and self-consumed solar energy
+- **Section 2 — Last 6 days:** Rolling display with yesterday rightmost, updates daily
+- **Section 3 — Monthly overview:** All 12 months in two rows; current month updated live from utility meter; months without data show `---`
+- **Section 4 — Per year + Lifetime totals:** Current year auto-summed from yearly utility meter + offset; lifetime produced, self-consumed, imported and exported totals
+- **Battery and WiFi status** icons in the top-right corner, updated every 15 minutes
 - **Physical refresh button** (KEY0/GPIO3) triggers an immediate display update
 - **HA button entity** for remote refresh from the Home Assistant dashboard
-- **Night mode:** No display updates between 22:00 and 06:00 to save battery
-- **Hourly updates** during daytime (06:00–22:00)
+- **Night mode:** No display updates between 23:00 and 06:00 to save battery
+- **Updates every 5 minutes** during daytime (06:00–23:00)
 - **WiFi power save mode** enabled
 
 ---
@@ -43,19 +43,20 @@ Clone or download the custom component from [koosoli's repository](https://githu
 
 ### Home Assistant sensors
 
-The following sensors must exist in your Home Assistant instance. These are typically provided by your inverter integration (e.g. Solis, SolarEdge, Huawei - I am using Sungrow, fetching data through modbus):
+The following sensors must exist in your Home Assistant instance. These are typically provided by your inverter integration (e.g. Solis, SolarEdge, Huawei):
 
 | Sensor | Description |
 |---|---|
 | `sensor.daily_pv_generation` | Solar energy produced today |
-| `sensor.daily_exported_energy` | Solar energy exported to grid today |
 | `sensor.daily_imported_energy` | Grid energy imported today |
 | `sensor.daily_consumed_energy` | Total energy consumed today |
+| `sensor.daily_direct_energy_consumption` | Self-consumed solar energy today |
 | `sensor.total_pv_generation` | Lifetime solar production |
 | `sensor.total_imported_energy` | Lifetime grid import |
 | `sensor.total_direct_energy_consumption` | Lifetime self-consumed solar |
 | `sensor.total_exported_energy` | Lifetime solar export |
-| `sensor.monthly_pv_generation` | Current month solar production (from inverter) |
+| `sensor.monthly_pv_generation_2` | Current month solar production (utility meter based on total_pv_generation) |
+| `sensor.yearly_pv_generation` | Current year solar production (utility meter based on total_pv_generation) |
 
 ### Home Assistant helpers
 
@@ -327,8 +328,8 @@ mode: single
 |---|---|---|
 | Timezone | `time` block | `Europe/Stockholm` |
 | Sensor entity IDs | `sensor` block | See table above |
-| Update interval | `update_interval` in display block | `3600s` |
-| Active hours | `now.hour < 6 \|\| now.hour >= 22` | 06:00–22:00 |
+| Update interval | `interval` block | `300s` (every 5 min) |
+| Active hours | `now.hour >= 6 && now.hour < 23` | 06:00–23:00 |
 | VCOM value | `vcom` in display block | `1400` |
 
 > **VCOM:** The value `1400` is specific to this unit. Check the label on your display's FPC cable if results look washed out or ghosted.
@@ -336,5 +337,8 @@ mode: single
 ---
 
 ## License
+
+MIT
+
 
 MIT
