@@ -2,7 +2,7 @@
 
 An ESPHome configuration for the [Seeed reTerminal E1003](https://www.seeedstudio.com/reTerminal-E1003-p-6731.html) 10.3-inch e-ink display, showing stylish solar production data from Home Assistant.
 
-![Display photo](images/display.JPG)
+![Display photo](images/img7456.jpg)
 
 ---
 
