@@ -71,14 +71,14 @@ sensor:
     id: daily_pv_generation
     entity_id: sensor.daily_pv_generation
   - platform: homeassistant
-    id: daily_exported_energy
-    entity_id: sensor.daily_exported_energy
-  - platform: homeassistant
     id: daily_imported_energy
     entity_id: sensor.daily_imported_energy
   - platform: homeassistant
     id: daily_consumed_energy
     entity_id: sensor.daily_consumed_energy
+  - platform: homeassistant
+    id: daily_direct_energy
+    entity_id: sensor.daily_direct_energy_consumption
   # ── Lifetime total sensors ──
   - platform: homeassistant
     id: total_pv_generation
@@ -92,6 +92,20 @@ sensor:
   - platform: homeassistant
     id: total_exported_energy
     entity_id: sensor.total_exported_energy
+  # ── Yearly sensors ──
+  - platform: homeassistant
+    id: yearly_pv_generation
+    entity_id: sensor.yearly_pv_generation
+  - platform: homeassistant
+    id: solar_year_offset_2026
+    entity_id: input_number.solar_year_offset_2026
+  # ── Monthly sensors ──
+  - platform: homeassistant
+    id: monthly_pv_generation
+    entity_id: sensor.monthly_pv_generation_2
+  - platform: homeassistant
+    id: solar_maj_offset
+    entity_id: input_number.solar_maj_offset
   # ── Weekday helpers (input_number, min=-1 for "no data") ──
   - platform: homeassistant
     id: solar_mandag
@@ -166,7 +180,7 @@ sensor:
     pin: GPIO1
     id: battery_voltage
     name: "Battery Voltage"
-    update_interval: 3600s
+    update_interval: 900s
     attenuation: 12db
     filters:
       - multiply: 2.0
@@ -177,7 +191,7 @@ sensor:
   - platform: wifi_signal
     id: wifi_signal_strength
     name: "WiFi Signal"
-    update_interval: 3600s
+    update_interval: 900s
 
 font:
   - file: "gfonts://Josefin Sans"
@@ -277,24 +291,24 @@ display:
       it.printf(60, box_y + 55, id(font_xlarge), WHITE, "%s", tbuf);
       it.print(252, box_y + 85, id(font_large), WHITE, "kWh");
 
-      // Box 2: Solar energy exported today
+      // Box 2: Total household energy consumption today
       it.rectangle(490, box_y, 440, box_h, WHITE);
-      it.print(510, box_y + 10, id(font_small), WHITE, "Såld solenergi idag");
-      fmt_komma1(id(daily_exported_energy).state, tbuf, sizeof(tbuf));
+      it.print(510, box_y + 10, id(font_small), WHITE, "Husets energiförbrukning");
+      fmt_komma1(id(daily_consumed_energy).state, tbuf, sizeof(tbuf));
       it.printf(510, box_y + 55, id(font_xlarge), WHITE, "%s", tbuf);
       it.print(702, box_y + 85, id(font_large), WHITE, "kWh");
 
       // Box 3: Grid energy imported today
       it.rectangle(940, box_y, 440, box_h, WHITE);
-      it.print(962, box_y + 10, id(font_small), WHITE, "Köpt energi idag");
+      it.print(962, box_y + 10, id(font_small), WHITE, "Varav köpt energi");
       fmt_komma1(id(daily_imported_energy).state, tbuf, sizeof(tbuf));
       it.printf(962, box_y + 55, id(font_xlarge), WHITE, "%s", tbuf);
       it.print(1154, box_y + 85, id(font_large), WHITE, "kWh");
 
-      // Box 4: Total energy consumed today
+      // Box 4: Self-consumed solar energy today
       it.rectangle(1390, box_y, 440, box_h, WHITE);
-      it.print(1412, box_y + 10, id(font_small), WHITE, "Total använd energi idag");
-      fmt_komma1(id(daily_consumed_energy).state, tbuf, sizeof(tbuf));
+      it.print(1412, box_y + 10, id(font_small), WHITE, "Använd solel idag");
+      fmt_komma1(id(daily_direct_energy).state, tbuf, sizeof(tbuf));
       it.printf(1412, box_y + 55, id(font_xlarge), WHITE, "%s", tbuf);
       it.print(1604, box_y + 85, id(font_large), WHITE, "kWh");
 
@@ -354,7 +368,7 @@ display:
         id(solar_februari).state,
         id(solar_mars).state,
         id(solar_april).state,
-        id(solar_maj).state,
+        id(monthly_pv_generation).state + id(solar_maj_offset).state,  // current month direct from sensor + offset
         id(solar_juni).state,
         id(solar_juli).state,
         id(solar_augusti).state,
@@ -402,12 +416,8 @@ display:
       it.line(40, 1004, 630, 1004, WHITE);   // under "per år", ends at right edge of Feb/Aug
       it.line(640, 1004, 1832, 1004, WHITE); // under "totalt", starts at left edge of Mars/Sep
 
-      // Current year (2026) is summed automatically from monthly helpers
-      float sum_2026 = 0;
-      for (int i = 0; i < 12; i++) {
-        float v = manad_data[i];
-        if (!isnan(v) && v >= 0) sum_2026 += v;
-      }
+      // Current year summed from yearly utility meter + offset for days before sensor was created
+      float sum_2026 = id(yearly_pv_generation).state + id(solar_year_offset_2026).state;
 
       const char* ar_namn[] = {"2023", "2024", "2025", "2026"};
       float ar_data[] = {
@@ -451,13 +461,13 @@ display:
         id(sntp_time).now().hour, id(sntp_time).now().minute);
 
 interval:
-  - interval: 3600s
+  - interval: 300s
     then:
       - if:
           condition:
             lambda: |-
               auto now = id(sntp_time).now();
-              return now.is_valid() && now.hour >= 6 && now.hour < 22;
+              return now.is_valid() && now.hour >= 6 && now.hour < 23;
           then:
             - component.update: epaper_display
 
